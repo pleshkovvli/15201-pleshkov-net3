@@ -10,7 +10,7 @@ private object JacksonAPI {
     private val mapper = jacksonObjectMapper()
     private val writer = mapper.writerWithDefaultPrettyPrinter()
     fun toJson(value: Any) : String = writer.writeValueAsString(value)
-    fun <T> fromJson(json: String, clazz: Class<T>) : T = mapper.readValue(json, clazz)
+    fun <T> fromJson(json: String, clazz: Class<T>) : T = mapper.readValue<T>(json, clazz)
 }
 
 fun Any.toJson() = JacksonAPI.toJson(this)
