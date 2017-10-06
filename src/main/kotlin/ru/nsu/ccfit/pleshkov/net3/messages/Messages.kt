@@ -8,7 +8,6 @@ import java.net.InetSocketAddress
 import java.util.*
 import kotlin.collections.ArrayList
 
-private const val ERROR: Byte = -1
 internal const val JOIN: Byte = 0
 internal const val ACK: Byte = 1
 internal const val DATA: Byte = 2
@@ -18,18 +17,21 @@ internal const val NEW_PARENT: Byte = 4
 internal class MessageHolder {
     val code: Byte
     val guid: UUID
-    val jsonMessage: String
+    val jsonMessage: String     //Shouldn't be private for serialization
+
     constructor(message: Message, guid: UUID  = UUID.randomUUID()) {
         this.guid = guid
         code = message.code
         jsonMessage = message.toJson()
     }
+
     @JsonCreator
     constructor(code: Byte, guid: UUID, jsonMessage: String) {
         this.code = code
         this.guid = guid
         this.jsonMessage = jsonMessage
     }
+
     fun parseMessage(): Message {
         val clazz = when(code) {
             JOIN -> JoinMessage::class.java
@@ -53,10 +55,11 @@ internal data class MessageWithGuid(val guid: UUID, val message: Message)
 internal sealed class Message(val code: Byte)
 internal data class JoinMessage(val name: String) : Message(JOIN)
 internal data class AckMessage(val guidOfAck: UUID) : Message(ACK)
+const val ANSI_GREEN = "\u001B[32m";
 internal data class DataMessage(val sender: String, val message: String) : Message(DATA) {
-    override fun toString(): String {
-        return "\nFROM $sender\n$message\n"
+    fun printItColorful() {
+        println("$ANSI_GREEN \nFROM $sender\n$message\n")
     }
 }
 internal data class AdoptMessage(val children: ArrayList<InetSocketAddress>) : Message(ADOPT)
-internal data class NewParentMessage(val parent: InetSocketAddress?) : Message(NEW_PARENT)
+internal data class NewParentMessage(val parent: InetSocketAddress) : Message(NEW_PARENT)

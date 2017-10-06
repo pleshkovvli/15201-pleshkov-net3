@@ -1,6 +1,6 @@
 package ru.nsu.ccfit.pleshkov.net3
 
-import java.net.InetSocketAddress
+import ru.nsu.ccfit.pleshkov.net3.node.TreeNode
 
 fun main(args: Array<String>) {
     if (args.size < 3) {
@@ -14,10 +14,11 @@ fun main(args: Array<String>) {
     }
     try {
         val port = getPort(args[2])
-        val parentIpAndPort: InetSocketAddress? = if (args.size == 3)
-            null else getIpAndPort(args[3])
+        val parentIpAndPort = if (args.size == 3) null else getIpAndPort(args[3])
         TreeNode(args[0], losses, port, parentIpAndPort).start()
     } catch (e: InitializationException) {
         println(e.message)
+    } catch (e: Exception) {
+        println("Something went wrong ${e.message}")
     }
 }

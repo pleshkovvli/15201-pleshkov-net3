@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.UnknownHostException
-
+import java.util.*
 
 private object JacksonAPI {
     private val mapper = jacksonObjectMapper()
@@ -24,17 +24,26 @@ fun getPort(portString: String) : Int {
     return port
 }
 
+fun UUID.short() = this.toString().substring(0, 6)
+
 fun getIpAndPort(ipAndPort: String) : InetSocketAddress {
     val ipString = ipAndPort.substringBefore(':', "")
     val portString = ipAndPort.substringAfter(':', "")
+
     if(ipString.isEmpty() || portString.isEmpty()) {
         throw InitializationException("Address should be in format: IP:PORT")
     }
+
     val ip = try {
         InetAddress.getByName(ipString)
     } catch (e: UnknownHostException) {
         throw InitializationException("Couldn't find host at $ipString")
     }
+
     val port = getPort(portString)
     return InetSocketAddress(ip, port)
+}
+
+class LimitedLinkedHashMap<K, V>(private val capacity: Int) : LinkedHashMap<K, V>(capacity) {
+    override fun removeEldestEntry(p0: MutableMap.MutableEntry<K, V>?) = size > capacity
 }
