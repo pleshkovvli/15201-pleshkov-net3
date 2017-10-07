@@ -46,6 +46,12 @@ jar {
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    archiveName 'net3.jar'
+}
+
+
+tasks.withType(Jar) {
+    destinationDir = file("$rootDir")
 }
 
 compileKotlin {
